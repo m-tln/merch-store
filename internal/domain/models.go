@@ -2,17 +2,21 @@ package domain
 
 import "time"
 
+type User struct {
+	ID           int `gorm:"primaryKey"`
+	Name         string `gorm:"not null"`
+	PasswordHash string
+	Balance      uint64
+}
+
+type Token struct {
+	AccessToken string
+}
+
 type Goods struct {
 	ID    uint64 `gorm:"primaryKey"`
 	Name  string `gorm:"not null"`
 	Price uint64 `gorm:"not null"`
-}
-
-type User struct {
-	ID           uint64 `gorm:"primaryKey"`
-	Name         string `gorm:"not null"`
-	PasswordHash string
-	Balance      uint64
 }
 
 type Purchase struct {

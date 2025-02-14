@@ -6,4 +6,5 @@ type UserRepository interface {
 	Create(*domain.User) error
 	FindByID(int) (*domain.User, error)
 	UpdateBalance(int, int) (error)
+	FindByUsername(string) (*domain.User, error)
 }

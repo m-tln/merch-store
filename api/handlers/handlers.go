@@ -1,29 +1,39 @@
 package handlers
 
- import (
-	 "context"
-	 "net/http"
-	 "errors"
+import (
+	"context"
+	"errors"
+	"net/http"
 
-	 openapi "merch-store/api/generated/go"
- )
+	"merch-store/adapter/logger"
+	openapi "merch-store/api/generated/go"
+	"merch-store/internal/repository"
+)
 
  type CustomAPIService struct {
+	userRepo *repository.UserRepository
+	purchaseRepo *repository.PurchaseRepository
+	goodsRepo *repository.GoodsRepository
+	transactionRepo *repository.TransactionRepository
+	log logger.CustomLogger
  }
  
  // NewDefaultAPIService creates a default api service
- func NewDefaultAPIService() *CustomAPIService {
-	 return &CustomAPIService{}
+ func NewCustomAPIService(userRepo *repository.UserRepository,
+	purchaseRepo *repository.PurchaseRepository,
+	goodsRepo *repository.GoodsRepository,
+	transactionRepo *repository.TransactionRepository) *CustomAPIService {
+	 return &CustomAPIService{userRepo: userRepo, purchaseRepo: purchaseRepo, 
+							  goodsRepo: goodsRepo, transactionRepo: transactionRepo}
  }
  
  // ApiInfoGet - Получить информацию о монетах, инвентаре и истории транзакций.
  func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse, error) {
-	 // TODO - update ApiInfoGet with the required logic for this service method.
-	 // Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
- 
+	s.log.Info("Get info", map[string]interface{}{})
+
 	 // TODO: Uncomment the next line to return response Response(200, InfoResponse{}) or use other options such as http.Ok ...
 	 // return Response(200, InfoResponse{}), nil
- 
+	
 	 // TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
 	 // return Response(400, ErrorResponse{}), nil
  

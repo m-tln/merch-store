@@ -29,3 +29,7 @@ func (uc *UserUseCase) GetUserByID(id int) (*domain.User, error) {
 func (uc *UserUseCase) UpdateUserBalance(id int, balance int) error {
     return uc.userRepo.UpdateBalance(id, balance)
 }
+
+func (uc *UserUseCase) FindByUsername(username string) (*domain.User, error) {
+    return uc.userRepo.FindByUsername(username)
+}
