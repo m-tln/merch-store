@@ -13,7 +13,7 @@ func NewPurchaseRepositoryImpl(db *gorm.DB) *PurchaseRepositoryImpl {
 	return &PurchaseRepositoryImpl{db: db}
 }
 
-func (r *PurchaseRepositoryImpl) Create(purchase domain.Purchase) error {
+func (r *PurchaseRepositoryImpl) Create(purchase *domain.Purchase) error {
 	return r.db.Create(purchase).Error
 }
 
