@@ -31,6 +31,15 @@ import (
  func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse, error) {
 	s.log.Info("Get info", map[string]interface{}{})
 
+	_, ok := ctx.Value("userID").(string)
+	if !ok {
+		s.log.Error("Missing userID in context", map[string]interface{}{})
+		return openapi.Response(http.StatusUnauthorized, openapi.ErrorResponse{Errors: "Unauthorized: Missing userID"}), nil
+	}
+
+
+
+	
 	 // TODO: Uncomment the next line to return response Response(200, InfoResponse{}) or use other options such as http.Ok ...
 	 // return Response(200, InfoResponse{}), nil
 	
