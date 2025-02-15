@@ -22,10 +22,10 @@ func NewSendCoinUseCase(userRepo repository.UserRepository,
 
 const SmallBalanceToSend string = "not enough coins to send"
 
-func (uc *SendCoinUseCase) MakeTransaction(from string, to string, amount int32) error {
-	userFrom, err := uc.userRepo.FindByUsername(from)
+func (uc *SendCoinUseCase) MakeTransaction(from int, to string, amount int32) error {
+	userFrom, err := uc.userRepo.FindByID(from)
 	if err != nil {
-		return fmt.Errorf("user with username %s can't be found in db, error: %v", from, err)
+		return fmt.Errorf("user with username %v can't be found in db, error: %v", from, err)
 	}
 
 	if userFrom.Balance < uint64(amount) {
@@ -39,7 +39,7 @@ func (uc *SendCoinUseCase) MakeTransaction(from string, to string, amount int32)
 
 	err = uc.userRepo.UpdateBalance(userFrom.ID, int(userFrom.Balance) - int(amount))
 	if err != nil {
-		return fmt.Errorf("balance of %s can't be updated, error: %v", from, err)
+		return fmt.Errorf("balance of %v can't be updated, error: %v", from, err)
 	}
 
 	err = uc.userRepo.UpdateBalance(userTo.ID, int(userTo.Balance) + int(amount))

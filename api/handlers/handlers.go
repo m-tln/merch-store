@@ -4,89 +4,93 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"merch-store/adapter/logger"
 	openapi "merch-store/api/generated/go"
+	usecase "merch-store/internal/usecase"
 )
 
 type CustomAPIService struct {
-	// userRepo        repository.UserRepository
-	// purchaseRepo    repository.PurchaseRepository
-	// goodsRepo       repository.GoodsRepository
-	// transactionRepo repository.TransactionRepository
+	infoUseCase     usecase.InfoUseCase
+	sendCoinsUseCase     usecase.SendCoinUseCase
+	purchaseUseCase usecase.PurchaseUseCase
+	authUseCase     usecase.AuthUseCase
 	log             logger.CustomLogger
 }
 
 // NewDefaultAPIService creates a default api service
-// func NewCustomAPIService(userRepo repository.UserRepository,
-// 	purchaseRepo repository.PurchaseRepository,
-// 	goodsRepo repository.GoodsRepository,
-// 	transactionRepo repository.TransactionRepository) *CustomAPIService {
-// 	return &CustomAPIService{userRepo: userRepo, purchaseRepo: purchaseRepo,
-// 		goodsRepo: goodsRepo, transactionRepo: transactionRepo}
-// }
-
-func NewCustomAPIService() *CustomAPIService {
-	return &CustomAPIService{log: logger.CustomLogger{}}
+func NewCustomAPIService(infoUseCase usecase.InfoUseCase,
+	sendCoinsUseCase usecase.SendCoinUseCase,
+	purchaseUseCase usecase.PurchaseUseCase,
+	authUseCase usecase.AuthUseCase) *CustomAPIService {
+	return &CustomAPIService{infoUseCase: infoUseCase, purchaseUseCase: purchaseUseCase,
+		sendCoinsUseCase: sendCoinsUseCase, authUseCase: authUseCase}
 }
 
 // ApiInfoGet - Получить информацию о монетах, инвентаре и истории транзакций.
 func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse, error) {
 	s.log.Info("Get info", map[string]interface{}{})
 
-	// userIDstr, ok := ctx.Value("userID").(string)
-	// if !ok {
-	// 	s.log.Error("Missing userID in context", map[string]interface{}{})
-	// 	return openapi.Response(http.StatusUnauthorized, openapi.ErrorResponse{Errors: "Unauthorized: Missing userID"}), nil
-	// }
+	userIDstr, ok := ctx.Value("userID").(string)
+	if !ok {
+		s.log.Error("Missing userID in context", map[string]interface{}{})
+		return openapi.Response(http.StatusUnauthorized, openapi.ErrorResponse{Errors: "Unauthorized: Missing userID"}), nil
+	}
 
-	// userID, err := strconv.Atoi(userIDstr)
+	userID, err := strconv.Atoi(userIDstr)
 
-	// if err != nil {
-	// 	s.log.Error("strcov failed", map[string]interface{}{"Error": err})
-	// 	return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
-	// }
+	if err != nil {
+		s.log.Error("strcov failed", map[string]interface{}{"Error": err})
+		return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
+	}
 
-	// s.log.Info("Request from user", map[string]interface{}{"userID": userID})
+	s.log.Info("Request from user", map[string]interface{}{"userID": userID})
+	responce := openapi.InfoResponse{}
 
-	// user, err := s.userRepo.FindByID(userID)
+	responce.Coins, err = s.infoUseCase.GetBalance(userID)
+	if err != nil {
+		s.log.Error("get balance failed", map[string]interface{}{"Error": err})
+		return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
+	}
 
-	// if err != nil {
-	// 	s.log.Error("user getting failed", map[string]interface{}{"Error": err})
-	// }
+	inventory, err := s.infoUseCase.GetInvetory(userID)
+	if err != nil {
+		s.log.Error("get inventory failed", map[string]interface{}{"Error": err})
+		return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
+	}
 
-	balance := 10 // user.Balance
+	for item, quantity := range inventory {
+		responce.Inventory = append(responce.Inventory, openapi.InfoResponseInventoryInner{Type: item, Quantity: quantity})
+	}
 
-	// _, err = s.transactionRepo.GetTransactionsByID(userID)
+	historySent, err := s.infoUseCase.GetSent(userID)
+	if err != nil {
+		s.log.Error("get icoin history failed", map[string]interface{}{"Error": err})
+		return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
+	}
 
-	// if err != nil {
-	// 	s.log.Error("transactions getting failed", map[string]interface{}{"Error": err})
-	// 	return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
-	// }
+	for userTo, transactions := range historySent {
+		for _, transaction := range transactions {
+			responce.CoinHistory.Sent = append(responce.CoinHistory.Sent,
+				openapi.InfoResponseCoinHistorySentInner{ToUser: userTo, Amount: int32(transaction)})
+		}
+	}
 
-	// _, err = s.purchaseRepo.FindByUserID(userID)
+	historyReceived, err := s.infoUseCase.GetRecieved(userID)
+	if err != nil {
+		s.log.Error("get icoin history failed", map[string]interface{}{"Error": err})
+		return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
+	}
 
-	// if err != nil {
-	// 	s.log.Error("purchases getting failed", map[string]interface{}{"Error": err})
-	// 	return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
-	// }
+	for userFrom, transactions := range historyReceived {
+		for _, transaction := range transactions {
+			responce.CoinHistory.Received = append(responce.CoinHistory.Received,
+				openapi.InfoResponseCoinHistoryReceivedInner{FromUser: userFrom, Amount: int32(transaction)})
+		}
+	}
 
-
-	return openapi.Response(http.StatusOK, openapi.InfoResponse{
-		Coins: int32(balance),
-	}), nil
-
-	// TODO: Uncomment the next line to return response Response(200, InfoResponse{}) or use other options such as http.Ok ...
-	// return Response(200, InfoResponse{}), nil
-
-	// TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	// return Response(400, ErrorResponse{}), nil
-
-	// TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	// return Response(401, ErrorResponse{}), nil
-
-	// TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	// return Response(500, ErrorResponse{}), nil
+	return openapi.Response(http.StatusOK, responce), nil
 }
 
 // ApiSendCoinPost - Отправить монеты другому пользователю.
@@ -134,6 +138,11 @@ func (s *CustomAPIService) ApiBuyItemGet(ctx context.Context, item string) (open
 // ApiAuthPost - Аутентификация и получение JWT-токена.
 func (s *CustomAPIService) ApiAuthPost(ctx context.Context, body openapi.AuthRequest) (openapi.ImplResponse, error) {
 	s.log.Info("Auth post", map[string]interface{}{})
-	
-	return openapi.Response(http.StatusNotImplemented, nil), errors.New("ApiAuthPost method not implemented")	
+
+	str, err := s.authUseCase.GetToken(body.Username, body.Password)
+	if err != nil {
+		s.log.Error("get coin failed", map[string]interface{}{"Error": err})
+	}
+
+	return openapi.Response(http.StatusOK, openapi.AuthResponse{Token: *str}), nil
 }

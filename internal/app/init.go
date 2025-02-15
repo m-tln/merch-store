@@ -1,89 +1,88 @@
 package app
 
-// import (
-// 	"fmt"
-// 	"net/http"
+import (
+	"fmt"
+	"net/http"
 
-// 	"merch-store/adapter/logger"
-// 	"merch-store/adapter/repository"
-// 	openapi "merch-store/api/generated/go"
-// 	"merch-store/api/handlers"
-// 	"merch-store/internal/config"
-// 	"merch-store/internal/service"
-// 	"merch-store/internal/usecases"
-// 	"merch-store/pkg/middleware"
-// )
+	"merch-store/adapter/logger"
+	"merch-store/adapter/repository"
+	"merch-store/api/controller"
+	"merch-store/api/generated/go"
+	"merch-store/api/handlers"
+	"merch-store/internal/config"
+	"merch-store/internal/service"
+	"merch-store/internal/usecase"
+)
 
-// type Service struct {
-// 	router http.Handler
+type Service struct {
+	router http.Handler
 
-// 	log *logger.CustomLogger
-// 	cfg *config.Config
-// }
+	log *logger.CustomLogger
+	cfg *config.Config
+}
 
-// func NewService() (*Service, error) {
+func NewService() (*Service, error) {
 
-// 	log, err := logger.NewCustomLogger()
-	
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	log, err := logger.NewCustomLogger()
 
-// 	cfg, err := config.NewConfig()
+	if err != nil {
+		panic(err)
+	}
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	cfg, err := config.NewConfig()
 
-// 	return &Service{log: log, cfg: cfg}, nil
-// }
+	if err != nil {
+		return nil, err
+	}
 
-// func Init() error {
-// 	svc, err := NewService()
+	return &Service{log: log, cfg: cfg}, nil
+}
 
-// 	if err != nil {
-// 		return fmt.Errorf("can't make new service: %v", err)
-// 	}
+func Init() error {
+	svc, err := NewService()
 
-// 	dsn, err := svc.cfg.GetUserDSN()
-// 	if err != nil {
-// 		return fmt.Errorf("can't get user dsn: %v", err)
-// 	}
-// 	db, err := repository.InitBD(dsn)
-// 	if err != nil {
-// 		return fmt.Errorf("userDB can't be inited: %v", err)
-// 	}
+	if err != nil {
+		return fmt.Errorf("can't make new service: %v", err)
+	}
 
-// 	userRepo := repository.NewUserRepositoryImpl(db)
-// 	purchaseRepo := repository.NewPurchaseRepositoryImpl(db)
-// 	goodsRepo := repository.NewGoodsRepository(db)
-// 	transactionRepo := repository.NewTransactionRepositoryImpl(db)
+	dsn, err := svc.cfg.GetDSN()
+	if err != nil {
+		return fmt.Errorf("can't get dsn: %v", err)
+	}
+	db, err := repository.InitBD(dsn)
+	if err != nil {
+		return fmt.Errorf("userDB can't be inited: %v", err)
+	}
 
-// 	userRepoUseCase := usecase.NewUserUseCase(userRepo)
-// 	purchaseRepoUseCase := usecase.NewPurchaseUseCase(purchaseRepo)
-// 	goodsRepoUseCase := usecase.NewGoodsUseCase(goodsRepo)
-// 	transactionRepoUseCase := usecase.NewTransactionUseCase(transactionRepo)
+	userRepo := repository.NewUserRepositoryImpl(db)
+	purchaseRepo := repository.NewPurchaseRepositoryImpl(db)
+	goodsRepo := repository.NewGoodsRepository(db)
+	transactionRepo := repository.NewTransactionRepositoryImpl(db)
 
+	jwtSecret, err := svc.cfg.GetSecretJWT()
+	if err != nil {
+		return fmt.Errorf("can't get jwt secret: %v", err)
+	}
 
-// 	APIService := handlers.NewCustomAPIService(userRepoUseCase, purchaseRepoUseCase, 
-// 													  goodsRepoUseCase, transactionRepoUseCase)
-// 	APIController := openapi.NewDefaultAPIController(APIService)
+	infoUseCase := usecase.NewInfoUseCase(userRepo, goodsRepo, transactionRepo, purchaseRepo)
+	sendCoinsUseCase := usecase.NewSendCoinUseCase(userRepo, transactionRepo)
+	purchaseUseCase := usecase.NewPurchaseUseCase(purchaseRepo, goodsRepo, userRepo)
+	authUseCase := usecase.NewAuthUseCase(userRepo, service.NewJWTService(jwtSecret))
 
-// 	router := openapi.NewRouter(APIController)
+	APIService := handlers.NewCustomAPIService(*infoUseCase, *sendCoinsUseCase, *purchaseUseCase, *authUseCase)
+	APIController := controller.NewCustomAPIController(*APIService, service.NewJWTService(jwtSecret))
 
-// 	authMiddleware := middleware.AuthMiddleware(service.NewJWTService("pronin"))
-// 	protectRouter := authMiddleware(router)
+	router := openapi.NewRouter(APIController)
 
-// 	svc.router = protectRouter
+	svc.router = router
 
+	return http.ListenAndServe(":8080", router)
+}
 
-// 	return http.ListenAndServe(":8080", protectRouter)
-// }
+func Start() {
 
-// func Start() {
+}
 
-// }
+func Stop() {
 
-// func Stop() {
-
-// }
+}

@@ -22,39 +22,47 @@ func NewInfoUseCase(userRepo repository.UserRepository, goodsRepo repository.Goo
 	}
 }
 
-func (uc *InfoUseCase) GetInvetory(username string) (map[string]uint, error) {
-	user, err := uc.userRepo.FindByUsername(username)
+func (uc *InfoUseCase) GetBalance(id int) (int32, error) {
+	user, err := uc.userRepo.FindByID(id)
 	if err != nil {
-		return map[string]uint{}, fmt.Errorf("user with username %s can't be found in db, error: %v", username, err)
+		return 0, fmt.Errorf("user with username %v can't be found in db, error: %v", id, err)
+	}
+	return int32(user.Balance), nil
+}
+
+func (uc *InfoUseCase) GetInvetory(id int) (map[string]int32, error) {
+	user, err := uc.userRepo.FindByID(id)
+	if err != nil {
+		return map[string]int32{}, fmt.Errorf("user with username %v can't be found in db, error: %v", id, err)
 	}
 
 	purchases, err := uc.purchaseRepo.FindByUserID(user.ID)
 	if err != nil {
-		return map[string]uint{}, fmt.Errorf("purchases of %s can't be found, error: %v", username, err)
+		return map[string]int32{}, fmt.Errorf("purchases of %v can't be found, error: %v", id, err)
 	}
 
-	res := make(map[string]uint)
+	res := make(map[string]int32)
 	for _, purchase := range purchases {
 		item, err := uc.goodsRepo.FindByID(int(purchase.IDItem))
 		if err != nil {
-			return map[string]uint{}, fmt.Errorf("%v can't be found in db, error: %v", purchase.IDItem, err)
+			return map[string]int32{}, fmt.Errorf("%v can't be found in db, error: %v", purchase.IDItem, err)
 		}
-		res[item.Name] += uint(purchase.Volume)
+		res[item.Name] += int32(purchase.Volume)
 	}
 
 	return res, nil
 }
 
 
-func (uc *InfoUseCase) GetRecieved(username string) (map[string][]uint, error) {
-	user, err := uc.userRepo.FindByUsername(username)
+func (uc *InfoUseCase) GetRecieved(id int) (map[string][]uint, error) {
+	user, err := uc.userRepo.FindByID(id)
 	if err != nil {
-		return map[string][]uint{}, fmt.Errorf("user with username %s can't be found in db, error: %v", username, err)
+		return map[string][]uint{}, fmt.Errorf("user with username %v can't be found in db, error: %v", id, err)
 	}
 
 	transactions, err := uc.transactionRepo.GetTransactionsByIDTo(user.ID)
 	if err != nil {
-		return map[string][]uint{}, fmt.Errorf("transactions of %s can't be found, error: %v", username, err)
+		return map[string][]uint{}, fmt.Errorf("transactions of %v can't be found, error: %v", id, err)
 	}
 
 	res := make(map[string][]uint)
@@ -68,15 +76,15 @@ func (uc *InfoUseCase) GetRecieved(username string) (map[string][]uint, error) {
 	return res, nil
 }
 
-func (uc *InfoUseCase) GetSent(username string) (map[string][]uint, error) {
-	user, err := uc.userRepo.FindByUsername(username)
+func (uc *InfoUseCase) GetSent(id int) (map[string][]uint, error) {
+	user, err := uc.userRepo.FindByID(id)
 	if err != nil {
-		return map[string][]uint{}, fmt.Errorf("user with username %s can't be found in db, error: %v", username, err)
+		return map[string][]uint{}, fmt.Errorf("user with username %v can't be found in db, error: %v", id, err)
 	}
 
 	transactions, err := uc.transactionRepo.GetTransactionsByIDFrom(user.ID)
 	if err != nil {
-		return map[string][]uint{}, fmt.Errorf("transactions of %s can't be found, error: %v", username, err)
+		return map[string][]uint{}, fmt.Errorf("transactions of %v can't be found, error: %v", id, err)
 	}
 
 	res := make(map[string][]uint)

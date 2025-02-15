@@ -20,14 +20,14 @@ func NewPurchaseUseCase(purchaseRepo repository.PurchaseRepository, goodsRepo re
 
 const SmallBalanceToBuy string = "not enough coins to buy"
 
-func (uc *PurchaseUseCase) MakePurchase(username string, item string) error {
+func (uc *PurchaseUseCase) MakePurchase(id int, item string) error {
 	good, err := uc.goodsRepo.FindByName(item)
 	if err != nil {
 		return fmt.Errorf("%s can't be found in db, error: %v", item, err)
 	}
-	user, err := uc.userRepo.FindByUsername(username)
+	user, err := uc.userRepo.FindByID(id)
 	if err != nil {
-		return fmt.Errorf("user with username %s can't be found in db, error: %v", username, err)
+		return fmt.Errorf("user with username %v can't be found in db, error: %v", id, err)
 	}
 	if user.Balance < good.Price {
 		return errors.New(SmallBalanceToBuy)
@@ -36,7 +36,7 @@ func (uc *PurchaseUseCase) MakePurchase(username string, item string) error {
 	err = uc.userRepo.UpdateBalance(user.ID, int(user.Balance - good.Price))
 
 	if err != nil {
-		return fmt.Errorf("balance of %s can't be updated, error: %v", username, err)
+		return fmt.Errorf("balance of %v can't be updated, error: %v", id, err)
 	}
 
 	err = uc.purchaseRepo.Create(&domain.Purchase{
@@ -46,7 +46,7 @@ func (uc *PurchaseUseCase) MakePurchase(username string, item string) error {
 	})
 
 	if err != nil {
-		return fmt.Errorf("new purchase can't be created username: %s, item: %s, error: %v", username, item, err)
+		return fmt.Errorf("new purchase can't be created username: %v, item: %s, error: %v", id, item, err)
 	}
 
 	return nil
