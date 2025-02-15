@@ -30,6 +30,7 @@ func CheckPasswordHash(password, hash string) bool {
 
 func (uc *AuthUseCase) GetToken(username, password string) (*string, error) {
 	user, err := uc.userRepo.FindByUsername(username)
+	fmt.Println(username, password)
 	if err != nil {
 		// Automatically create user if not found
 		hash, err := HashPassword(password)
@@ -52,6 +53,7 @@ func (uc *AuthUseCase) GetToken(username, password string) (*string, error) {
 
 	// Generate JWT token
 	tokenString, err := uc.jwtService.GenerateToken(user.ID)
+	fmt.Print(tokenString)
 	if err != nil {
 		return nil, fmt.Errorf("error in generating token, %v", err)
 	}

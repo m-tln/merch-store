@@ -24,7 +24,7 @@ services:
         - internal
   
   db:
-    image: postgres:13
+    image: postgres:latest
     container_name: postgres
     environment:
       POSTGRES_USER: postgres

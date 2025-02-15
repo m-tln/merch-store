@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -34,13 +35,17 @@ func AuthMiddleware(config AuthMiddlewareConfig) func(http.HandlerFunc) http.Han
 				return
 			}
 
+			fmt.Println("token str: ", tokenString)
+
 			// Validate the token using the provided function
 			token, err := config.ValidateToken(tokenString)
+			fmt.Println("token: ", token)
 			if err != nil {
+				fmt.Println("err: ", err)
 				http.Error(w, "Failed to validate token", http.StatusInternalServerError)
 				return
 			}
-			if token.Valid {
+			if !token.Valid {
 				http.Error(w, "Invalid token", http.StatusUnauthorized)
 				return
 			}
@@ -50,12 +55,13 @@ func AuthMiddleware(config AuthMiddlewareConfig) func(http.HandlerFunc) http.Han
 				http.Error(w, "Missing claims", http.StatusInternalServerError)
 			}
 	
-			userID, ok := claims["user_id"].(string)
+			userID, ok := claims["user_id"]
 			if !ok {
 				http.Error(w, "Missing user_id in token", http.StatusInternalServerError)
 			}
 			ctx := context.WithValue(r.Context(), KeyUserID, userID)
-
+			fmt.Println("userID: ", userID)
+			fmt.Println("ctx: ", ctx.Value(KeyUserID))
 			// Token is valid, proceed to the next handler
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

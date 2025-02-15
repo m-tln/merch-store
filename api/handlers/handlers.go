@@ -3,20 +3,21 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
-	"strconv"
 
 	"merch-store/adapter/logger"
 	openapi "merch-store/api/generated/go"
 	usecase "merch-store/internal/usecase"
+	"merch-store/pkg/middleware"
 )
 
 type CustomAPIService struct {
-	infoUseCase     usecase.InfoUseCase
-	sendCoinsUseCase     usecase.SendCoinUseCase
-	purchaseUseCase usecase.PurchaseUseCase
-	authUseCase     usecase.AuthUseCase
-	log             logger.CustomLogger
+	infoUseCase      usecase.InfoUseCase
+	sendCoinsUseCase usecase.SendCoinUseCase
+	purchaseUseCase  usecase.PurchaseUseCase
+	authUseCase      usecase.AuthUseCase
+	log              logger.CustomLogger
 }
 
 // NewDefaultAPIService creates a default api service
@@ -32,18 +33,22 @@ func NewCustomAPIService(infoUseCase usecase.InfoUseCase,
 func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse, error) {
 	s.log.Info("Get info", map[string]interface{}{})
 
-	userIDstr, ok := ctx.Value("userID").(string)
+	userIDraw := ctx.Value(middleware.KeyUserID)
+	fmt.Println("raw: ", userIDraw)
+	userIDstr, ok := userIDraw.(float64)
+	fmt.Println("str: ", userIDstr)
 	if !ok {
 		s.log.Error("Missing userID in context", map[string]interface{}{})
 		return openapi.Response(http.StatusUnauthorized, openapi.ErrorResponse{Errors: "Unauthorized: Missing userID"}), nil
 	}
 
-	userID, err := strconv.Atoi(userIDstr)
+	userID := int(userIDstr)
 
-	if err != nil {
-		s.log.Error("strcov failed", map[string]interface{}{"Error": err})
-		return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
-	}
+	var err error
+	// if err != nil {
+	// 	s.log.Error("strcov failed", map[string]interface{}{"Error": err})
+	// 	return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
+	// }
 
 	s.log.Info("Request from user", map[string]interface{}{"userID": userID})
 	responce := openapi.InfoResponse{}

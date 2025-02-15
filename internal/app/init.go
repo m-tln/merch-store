@@ -7,7 +7,7 @@ import (
 	"merch-store/adapter/logger"
 	"merch-store/adapter/repository"
 	"merch-store/api/controller"
-	"merch-store/api/generated/go"
+	openapi "merch-store/api/generated/go"
 	"merch-store/api/handlers"
 	"merch-store/internal/config"
 	"merch-store/internal/service"
