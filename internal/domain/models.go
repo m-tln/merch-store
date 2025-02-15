@@ -4,7 +4,7 @@ import "time"
 
 type User struct {
 	ID           int `gorm:"primaryKey"`
-	Name         string `gorm:"not null"`
+	Name         string `gorm:"uniqueIndex"`
 	PasswordHash string
 	Balance      uint64
 }

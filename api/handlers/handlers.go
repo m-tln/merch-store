@@ -134,20 +134,6 @@ func (s *CustomAPIService) ApiBuyItemGet(ctx context.Context, item string) (open
 // ApiAuthPost - Аутентификация и получение JWT-токена.
 func (s *CustomAPIService) ApiAuthPost(ctx context.Context, body openapi.AuthRequest) (openapi.ImplResponse, error) {
 	s.log.Info("Auth post", map[string]interface{}{})
-	// TODO - update ApiAuthPost with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	// TODO: Uncomment the next line to return response Response(200, AuthResponse{}) or use other options such as http.Ok ...
-	// return Response(200, AuthResponse{}), nil
-
-	// TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	// return Response(400, ErrorResponse{}), nil
-
-	// TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	// return Response(401, ErrorResponse{}), nil
-
-	// TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	// return Response(500, ErrorResponse{}), nil
-
-	return openapi.Response(http.StatusNotImplemented, nil), errors.New("ApiAuthPost method not implemented")
+	
+	return openapi.Response(http.StatusNotImplemented, nil), errors.New("ApiAuthPost method not implemented")	
 }

@@ -1,4 +1,4 @@
-package auth
+package usecase
 
 import (
 	"fmt"
@@ -9,13 +9,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type LoginUseCase struct {
+type AuthUseCase struct {
 	userRepo   repository.UserRepository
 	jwtService *service.JWTService
 }
 
-func NewLoginUseCase(userRepo repository.UserRepository, jwtService *service.JWTService) *LoginUseCase {
-	return &LoginUseCase{userRepo: userRepo, jwtService: jwtService}
+func NewAuthUseCase(userRepo repository.UserRepository, jwtService *service.JWTService) *AuthUseCase {
+	return &AuthUseCase{userRepo: userRepo, jwtService: jwtService}
 }
 
 func HashPassword(password string) (string, error) {
@@ -28,7 +28,7 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func (uc *LoginUseCase) Execute(username, password string) (*domain.Token, error) {
+func (uc *AuthUseCase) GetToken(username, password string) (*string, error) {
 	user, err := uc.userRepo.FindByUsername(username)
 	if err != nil {
 		// Automatically create user if not found
@@ -56,5 +56,5 @@ func (uc *LoginUseCase) Execute(username, password string) (*domain.Token, error
 		return nil, fmt.Errorf("error in generating token, %v", err)
 	}
 
-	return &domain.Token{AccessToken: tokenString}, nil
+	return &tokenString, nil
 }

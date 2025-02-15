@@ -18,8 +18,14 @@ func (r *TransactionRepositoryImpl) Create(transacrion *domain.Transaction) erro
 	return r.db.Create(transacrion).Error
 }
 
-func (r *TransactionRepositoryImpl) GetTransactionsByID(id int) ([]domain.Transaction, error) {
+func (r *TransactionRepositoryImpl) GetTransactionsByIDFrom(id int) ([]domain.Transaction, error) {
 	var transactions []domain.Transaction
 	err := r.db.Where("id_from = ?", id).Find(&transactions).Error
+	return transactions, err
+}
+
+func (r *TransactionRepositoryImpl) GetTransactionsByIDTo(id int) ([]domain.Transaction, error) {
+	var transactions []domain.Transaction
+	err := r.db.Where("id_to = ?", id).Find(&transactions).Error
 	return transactions, err
 }
