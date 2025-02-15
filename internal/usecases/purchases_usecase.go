@@ -10,8 +10,8 @@ type PurchaseUseCase struct {
 	purchaseRepo repository.PurchaseRepository
 }
 
-func NewPurchaseUseCase(purchaseRepo *repository.PurchaseRepository) (*PurchaseUseCase) {
-	return	&PurchaseUseCase{purchaseRepo: *purchaseRepo}
+func NewPurchaseUseCase(purchaseRepo repository.PurchaseRepository) (*PurchaseUseCase) {
+	return	&PurchaseUseCase{purchaseRepo: purchaseRepo}
 }
 
 func (uc *PurchaseUseCase) Create(purchase *domain.Purchase) error {

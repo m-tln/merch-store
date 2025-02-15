@@ -10,7 +10,7 @@ import (
 
 // AuthMiddlewareConfig holds configuration for the authentication middleware
 type AuthMiddlewareConfig interface {
-	GetToken(tokenString string) (*jwt.Token, error) // Function to validate JWT tokens
+	ValidateToken(tokenString string) (*jwt.Token, error) // Function to validate JWT tokens
 }
 
 type contextKeyUserID string
@@ -35,7 +35,7 @@ func AuthMiddleware(config AuthMiddlewareConfig) func(http.Handler) http.Handler
 			}
 
 			// Validate the token using the provided function
-			token, err := config.GetToken(tokenString)
+			token, err := config.ValidateToken(tokenString)
 			if err != nil {
 				http.Error(w, "Failed to validate token", http.StatusInternalServerError)
 				return

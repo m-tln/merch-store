@@ -1,14 +1,11 @@
-FROM postgres:latest
-FROM golang:latest
+FROM golang:1.22
 
-RUN apt-get update && apt-get install -y pgcli
-ENV PATH=$PATH:/usr/bin/pgcli
+WORKDIR ${GOPATH}/avito-shop/
+COPY . ${GOPATH}/avito-shop/
 
-COPY . .
-WORKDIR /cmd
+RUN go build -o /build ./internal/cmd \
+    && go clean -cache -modcache
 
-RUN go mod download
-RUN go build -o app
+EXPOSE 8080
 
-CMD [ "./app" ]
-
+CMD ["/build"]

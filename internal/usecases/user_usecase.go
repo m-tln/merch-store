@@ -13,20 +13,15 @@ func NewUserUseCase(userRepo repository.UserRepository) *UserUseCase {
     return &UserUseCase{userRepo: userRepo}
 }
 
-func (uc *UserUseCase) CreateUser(name, passwordHash string, balance uint64) error {
-    user := &domain.User{
-        Name:         name,
-        PasswordHash: passwordHash,
-        Balance:      balance,
-    }
+func (uc *UserUseCase) Create(user *domain.User) error {
     return uc.userRepo.Create(user)
 }
 
-func (uc *UserUseCase) GetUserByID(id int) (*domain.User, error) {
+func (uc *UserUseCase) FindByID(id int) (*domain.User, error) {
     return uc.userRepo.FindByID(id)
 }
 
-func (uc *UserUseCase) UpdateUserBalance(id int, balance int) error {
+func (uc *UserUseCase) UpdateBalance(id int, balance int) error {
     return uc.userRepo.UpdateBalance(id, balance)
 }
 
