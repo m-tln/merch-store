@@ -17,8 +17,8 @@ type contextKeyUserID string
 const KeyUserID contextKeyUserID = "userID"
 
 // AuthMiddleware creates a new authentication middleware
-func AuthMiddleware(config AuthMiddlewareConfig) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
+func AuthMiddleware(config AuthMiddlewareConfig) func(http.HandlerFunc) http.HandlerFunc {
+	return func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Extract the token from the Authorization header
 			authHeader := r.Header.Get("Authorization")
