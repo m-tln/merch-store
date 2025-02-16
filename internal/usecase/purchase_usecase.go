@@ -41,7 +41,7 @@ func (uc *PurchaseUseCase) MakePurchase(id int, item string) error {
 
 	err = uc.purchaseRepo.Create(&domain.Purchase{
 		IDCostumer: uint64(user.ID),
-		IDItem: good.Price,
+		IDItem: good.ID,
 		Volume: 1,
 	})
 

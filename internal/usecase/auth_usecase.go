@@ -30,9 +30,10 @@ func CheckPasswordHash(password, hash string) bool {
 
 func (uc *AuthUseCase) GetToken(username, password string) (*string, error) {
 	user, err := uc.userRepo.FindByUsername(username)
-	fmt.Println(username, password)
+	fmt.Println("GetToken    username: ", username, " password: ", password)
 	if err != nil {
 		// Automatically create user if not found
+		fmt.Println("Error: ", err)
 		hash, err := HashPassword(password)
 		if err != nil {
 			return nil, fmt.Errorf("error in getting hash of password, %v", err)
@@ -40,11 +41,13 @@ func (uc *AuthUseCase) GetToken(username, password string) (*string, error) {
 		user = &domain.User{
 			Name:         username,
 			PasswordHash: hash,
+			Balance: 1000,
 		}
 		if err := uc.userRepo.Create(user); err != nil {
 			return nil, fmt.Errorf("error in creating user, %v", err)
 		}
 	}
+	fmt.Println("GetToken:   ", user.Name, "   ", user.PasswordHash)
 
 	// Validate password (in a real app, compare hashed passwords)
 	if !CheckPasswordHash(password, user.PasswordHash) {

@@ -28,7 +28,7 @@ func (r *UserRepositoryImpl) UpdateBalance(id int, balance int) error {
 }
 
 func (r *UserRepositoryImpl) FindByUsername(username string) (*domain.User, error) {
-    var user *domain.User
-    err := r.db.First(user, username).Error
-    return user, err
+    var user domain.User
+    err := r.db.Where("name = ?", username).First(&user).Error
+    return &user, err
 }

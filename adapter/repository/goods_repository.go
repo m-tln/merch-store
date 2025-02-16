@@ -24,7 +24,7 @@ func (r *GoodsRepositoryImpl) FindByID(id int) (*domain.Goods, error) {
 }
 
 func (r *GoodsRepositoryImpl) FindByName(name string) (*domain.Goods, error) {
-    var goods domain.Goods
-    err := r.db.First(&goods, name).Error
-    return &goods, err
+    var good domain.Goods
+    err := r.db.Where("name = ?", name).First(&good).Error
+    return &good, err
 }
