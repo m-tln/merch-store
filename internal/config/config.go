@@ -59,3 +59,7 @@ func (cfg *Config) GetSecretJWT() (string, error) {
 func (cfg *Config) GetPort() string {
 	return cfg.SERVER_PORT
 }
+
+func (cfg *Config) GetHost() string {
+	return cfg.SERVER_HOST
+}

@@ -15,6 +15,7 @@ services:
         - DATABASE_HOST=db
         # порт сервиса
         - SERVER_PORT=8080
+        - SERVER_HOST=0.0.0.0
         #
         - SECRET_JWT=pronin
       depends_on:

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -15,9 +16,9 @@ import (
 )
 
 type Service struct {
-	router http.Handler
+	server *http.Server
 
-	log *logger.CustomLogger
+	Log *logger.CustomLogger
 	cfg *config.Config
 }
 
@@ -32,26 +33,16 @@ func NewService() (*Service, error) {
 	cfg, err := config.NewConfig()
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't get config, error: %v", err)
 	}
 
-	return &Service{log: log, cfg: cfg}, nil
-}
-
-func Init() error {
-	svc, err := NewService()
-
+	dsn, err := cfg.GetDSN()
 	if err != nil {
-		return fmt.Errorf("can't make new service: %v", err)
-	}
-
-	dsn, err := svc.cfg.GetDSN()
-	if err != nil {
-		return fmt.Errorf("can't get dsn: %v", err)
+		return nil, fmt.Errorf("can't get dsn: %v", err)
 	}
 	db, err := repository.InitBD(dsn)
 	if err != nil {
-		return fmt.Errorf("userDB can't be inited: %v", err)
+		return nil, fmt.Errorf("userDB can't be inited: %v", err)
 	}
 
 	userRepo := repository.NewUserRepositoryImpl(db)
@@ -59,9 +50,9 @@ func Init() error {
 	goodsRepo := repository.NewGoodsRepository(db)
 	transactionRepo := repository.NewTransactionRepositoryImpl(db)
 
-	jwtSecret, err := svc.cfg.GetSecretJWT()
+	jwtSecret, err := cfg.GetSecretJWT()
 	if err != nil {
-		return fmt.Errorf("can't get jwt secret: %v", err)
+		return nil, fmt.Errorf("can't get jwt secret: %v", err)
 	}
 
 	infoUseCase := usecase.NewInfoUseCase(userRepo, goodsRepo, transactionRepo, purchaseRepo)
@@ -74,15 +65,22 @@ func Init() error {
 
 	router := openapi.NewRouter(APIController)
 
-	svc.router = router
+	serverAddress := fmt.Sprintf("%s:%s", cfg.GetHost(), cfg.GetPort())
 
-	return http.ListenAndServe(":8080", router)
+	server :=&http.Server{
+		Addr: serverAddress,
+		Handler: router,
+	}
+
+	return &Service{server: server, Log: log, cfg: cfg}, nil
 }
 
-func Start() {
-
+func (svc *Service) Start(ctx context.Context) error {
+	svc.Log.Info("Starting server...", map[string]interface{}{})
+	return svc.server.ListenAndServe()
 }
 
-func Stop() {
-
+func (svc *Service) Stop(ctx context.Context) error {
+	svc.Log.Info("Stopping server...", map[string]interface{}{})
+	return svc.server.Shutdown(ctx)
 }
