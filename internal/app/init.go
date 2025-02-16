@@ -47,7 +47,7 @@ func NewService() (*Service, error) {
 
 	userRepo := repository.NewUserRepositoryImpl(db)
 	purchaseRepo := repository.NewPurchaseRepositoryImpl(db)
-	productRepo := repository.NewProductsRepository(db)
+	productRepo := repository.NewProductsRepositoryImpl(db)
 	transactionRepo := repository.NewTransactionRepositoryImpl(db)
 
 	jwtSecret, err := cfg.GetSecretJWT()

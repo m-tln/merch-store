@@ -15,7 +15,7 @@ func TestPurchaseScenario(t *testing.T) {
 	}
 
 	usersRepo := repository.NewUserRepositoryImpl(db)
-	productsRepo := repository.NewProductsRepository(db)
+	productsRepo := repository.NewProductsRepositoryImpl(db)
 	purchasesRepo := repository.NewPurchaseRepositoryImpl(db)
 
 	purchaseUseCase := usecase.NewPurchaseUseCase(purchasesRepo, productsRepo, usersRepo)
