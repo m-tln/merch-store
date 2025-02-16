@@ -63,3 +63,7 @@ func (cfg *Config) GetPort() string {
 func (cfg *Config) GetHost() string {
 	return cfg.SERVER_HOST
 }
+
+func (cfg *Config) GetServerAddress() string {
+	return fmt.Sprintf("%s:%s", cfg.GetHost(), cfg.GetPort())
+}

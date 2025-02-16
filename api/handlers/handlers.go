@@ -3,12 +3,11 @@ package handlers
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"merch-store/adapter/logger"
-	openapi "merch-store/api/generated/go"
-	usecase "merch-store/internal/usecase"
+	"merch-store/api/generated/go"
+	"merch-store/internal/usecase"
 	"merch-store/pkg/middleware"
 )
 
@@ -34,9 +33,7 @@ func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse
 	s.log.Info("Get info", map[string]interface{}{})
 
 	userIDraw := ctx.Value(middleware.KeyUserID)
-	fmt.Println("raw: ", userIDraw)
 	userIDstr, ok := userIDraw.(float64)
-	fmt.Println("str: ", userIDstr)
 	if !ok {
 		s.log.Error("Missing userID in context", map[string]interface{}{})
 		return openapi.Response(http.StatusUnauthorized, openapi.ErrorResponse{Errors: "Unauthorized: Missing userID"}), nil
@@ -45,10 +42,6 @@ func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse
 	userID := int(userIDstr)
 
 	var err error
-	// if err != nil {
-	// 	s.log.Error("strcov failed", map[string]interface{}{"Error": err})
-	// 	return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), nil
-	// }
 
 	s.log.Info("Request from user", map[string]interface{}{"userID": userID})
 	responce := openapi.InfoResponse{}

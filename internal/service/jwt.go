@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -27,8 +26,6 @@ func (s *JWTService) GenerateToken(userID int) (string, error) {
 
 func (s *JWTService) ValidateToken(tokenString string) (*jwt.Token, error) {
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
- 		fmt.Println("parse sekret key: ", s.secretKey)
-		fmt.Println("parse tokenString: ", tokenString)
 		return []byte(s.secretKey), nil
 	})
 }

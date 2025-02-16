@@ -2,46 +2,36 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
 )
 
-// AuthMiddlewareConfig holds configuration for the authentication middleware
 type AuthMiddlewareConfig interface {
-	ValidateToken(tokenString string) (*jwt.Token, error) // Function to validate JWT tokens
+	ValidateToken(tokenString string) (*jwt.Token, error)
 }
 
 type contextKeyUserID string
 const KeyUserID contextKeyUserID = "userID"
 
-// AuthMiddleware creates a new authentication middleware
 func AuthMiddleware(config AuthMiddlewareConfig) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Extract the token from the Authorization header
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
 				http.Error(w, "Missing authorization header", http.StatusUnauthorized)
 				return
 			}
 
-			// Extract the token from the "Bearer <token>" format
 			tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 			if tokenString == "" {
 				http.Error(w, "Invalid token format", http.StatusUnauthorized)
 				return
 			}
 
-			fmt.Println("token str: ", tokenString)
-
-			// Validate the token using the provided function
 			token, err := config.ValidateToken(tokenString)
-			fmt.Println("token: ", token)
 			if err != nil {
-				fmt.Println("err: ", err)
 				http.Error(w, "Failed to validate token", http.StatusInternalServerError)
 				return
 			}
@@ -60,9 +50,6 @@ func AuthMiddleware(config AuthMiddlewareConfig) func(http.HandlerFunc) http.Han
 				http.Error(w, "Missing user_id in token", http.StatusInternalServerError)
 			}
 			ctx := context.WithValue(r.Context(), KeyUserID, userID)
-			fmt.Println("userID: ", userID)
-			fmt.Println("ctx: ", ctx.Value(KeyUserID))
-			// Token is valid, proceed to the next handler
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

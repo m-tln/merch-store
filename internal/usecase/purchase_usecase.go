@@ -9,11 +9,11 @@ import (
 
 type PurchaseUseCase struct {
 	purchaseRepo repository.PurchaseRepository
-	goodsRepo repository.GoodsRepository
+	goodsRepo repository.ProductsRepository
 	userRepo repository.UserRepository
 }
 
-func NewPurchaseUseCase(purchaseRepo repository.PurchaseRepository, goodsRepo repository.GoodsRepository, 
+func NewPurchaseUseCase(purchaseRepo repository.PurchaseRepository, goodsRepo repository.ProductsRepository, 
 						userRepo repository.UserRepository) *PurchaseUseCase {
 	return &PurchaseUseCase{purchaseRepo: purchaseRepo, goodsRepo: goodsRepo, userRepo: userRepo}
 }

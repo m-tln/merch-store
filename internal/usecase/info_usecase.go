@@ -7,12 +7,12 @@ import (
 
 type InfoUseCase struct {
 	userRepo        repository.UserRepository
-	goodsRepo       repository.GoodsRepository
+	goodsRepo       repository.ProductsRepository
 	transactionRepo repository.TransactionRepository
 	purchaseRepo    repository.PurchaseRepository
 }
 
-func NewInfoUseCase(userRepo repository.UserRepository, goodsRepo repository.GoodsRepository,
+func NewInfoUseCase(userRepo repository.UserRepository, goodsRepo repository.ProductsRepository,
 	transactionRepo repository.TransactionRepository, purchaseRepo repository.PurchaseRepository) *InfoUseCase {
 	return &InfoUseCase{
 		userRepo:        userRepo,

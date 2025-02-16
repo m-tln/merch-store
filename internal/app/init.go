@@ -8,7 +8,7 @@ import (
 	"merch-store/adapter/logger"
 	"merch-store/adapter/repository"
 	"merch-store/api/controller"
-	openapi "merch-store/api/generated/go"
+	"merch-store/api/generated/go"
 	"merch-store/api/handlers"
 	"merch-store/internal/config"
 	"merch-store/internal/service"
@@ -47,7 +47,7 @@ func NewService() (*Service, error) {
 
 	userRepo := repository.NewUserRepositoryImpl(db)
 	purchaseRepo := repository.NewPurchaseRepositoryImpl(db)
-	goodsRepo := repository.NewGoodsRepository(db)
+	productRepo := repository.NewProductsRepository(db)
 	transactionRepo := repository.NewTransactionRepositoryImpl(db)
 
 	jwtSecret, err := cfg.GetSecretJWT()
@@ -55,9 +55,9 @@ func NewService() (*Service, error) {
 		return nil, fmt.Errorf("can't get jwt secret: %v", err)
 	}
 
-	infoUseCase := usecase.NewInfoUseCase(userRepo, goodsRepo, transactionRepo, purchaseRepo)
+	infoUseCase := usecase.NewInfoUseCase(userRepo, productRepo, transactionRepo, purchaseRepo)
 	sendCoinsUseCase := usecase.NewSendCoinUseCase(userRepo, transactionRepo)
-	purchaseUseCase := usecase.NewPurchaseUseCase(purchaseRepo, goodsRepo, userRepo)
+	purchaseUseCase := usecase.NewPurchaseUseCase(purchaseRepo, productRepo, userRepo)
 	authUseCase := usecase.NewAuthUseCase(userRepo, service.NewJWTService(jwtSecret))
 
 	APIService := handlers.NewCustomAPIService(*infoUseCase, *sendCoinsUseCase, *purchaseUseCase, *authUseCase)
@@ -65,7 +65,7 @@ func NewService() (*Service, error) {
 
 	router := openapi.NewRouter(APIController)
 
-	serverAddress := fmt.Sprintf("%s:%s", cfg.GetHost(), cfg.GetPort())
+	serverAddress := cfg.GetServerAddress()
 
 	server :=&http.Server{
 		Addr: serverAddress,

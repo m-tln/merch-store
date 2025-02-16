@@ -1,8 +1,9 @@
 package repository
 
 import (
-    "merch-store/internal/domain"
-    "gorm.io/gorm"
+	"merch-store/internal/domain"
+
+	"gorm.io/gorm"
 )
 
 type PurchaseRepositoryImpl struct {
@@ -14,11 +15,15 @@ func NewPurchaseRepositoryImpl(db *gorm.DB) *PurchaseRepositoryImpl {
 }
 
 func (r *PurchaseRepositoryImpl) Create(purchase *domain.Purchase) error {
-	return r.db.Create(purchase).Error
+	return r.db.Create(PurchaseFromDomainToRepo(purchase)).Error
 }
 
 func (r *PurchaseRepositoryImpl) FindByUserID(userID int) ([]domain.Purchase, error) {
-    var purchases []domain.Purchase
-    err := r.db.Where("id_costumer = ?", userID).Find(&purchases).Error
-    return purchases, err
+	var purchasesRepo []Purchase
+	err := r.db.Where("id_costumer = ?", userID).Find(&purchasesRepo).Error
+	purchases := make([]domain.Purchase, len(purchasesRepo))
+	for _, purchase := range purchasesRepo {
+		purchases = append(purchases, *PurchaseFromRepoToDomain(&purchase))
+	}
+	return purchases, err
 }

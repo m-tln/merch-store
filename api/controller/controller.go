@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	openapi "merch-store/api/generated/go"
+	"merch-store/api/generated/go"
 	"merch-store/api/handlers"
 	"merch-store/pkg/middleware"
 
