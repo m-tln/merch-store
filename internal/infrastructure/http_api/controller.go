@@ -1,12 +1,11 @@
-package controller
+package http_api
 
 import (
 	"encoding/json"
 	"net/http"
 	"strings"
 
-	"merch-store/api/generated/go"
-	"merch-store/api/handlers"
+	openapi "merch-store/api/generated/go"
 	"merch-store/pkg/middleware"
 
 	"github.com/gorilla/mux"
@@ -14,8 +13,8 @@ import (
 
 // CustomAPIController binds http requests to an api service and writes the service results to the http response
 type CustomAPIController struct {
-	service      handlers.CustomAPIService
-	errorHandler openapi.ErrorHandler
+	service          CustomAPIService
+	errorHandler     openapi.ErrorHandler
 	tokenValidateSvc middleware.AuthMiddlewareConfig
 }
 
@@ -30,11 +29,11 @@ func WithCustomAPIErrorHandler(h openapi.ErrorHandler) CustomAPIOption {
 }
 
 // NewCustomAPIController creates a default api controller
-func NewCustomAPIController(s handlers.CustomAPIService, 
-							svc middleware.AuthMiddlewareConfig, opts ...CustomAPIOption) *CustomAPIController {
+func NewCustomAPIController(s CustomAPIService,
+	svc middleware.AuthMiddlewareConfig, opts ...CustomAPIOption) *CustomAPIController {
 	controller := &CustomAPIController{
-		service:      s,
-		errorHandler: openapi.DefaultErrorHandler,
+		service:          s,
+		errorHandler:     openapi.DefaultErrorHandler,
 		tokenValidateSvc: svc,
 	}
 

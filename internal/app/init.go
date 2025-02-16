@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"merch-store/adapter/logger"
-	"merch-store/adapter/repository"
-	"merch-store/api/controller"
-	"merch-store/api/generated/go"
-	"merch-store/api/handlers"
+	"merch-store/internal/infrastructure/repository"
+
+	openapi "merch-store/api/generated/go"
 	"merch-store/internal/config"
+	"merch-store/internal/infrastructure/http_api"
 	"merch-store/internal/service"
 	"merch-store/internal/usecase"
+	"merch-store/pkg/logger"
 )
 
 type Service struct {
@@ -60,15 +60,15 @@ func NewService() (*Service, error) {
 	purchaseUseCase := usecase.NewPurchaseUseCase(purchaseRepo, productRepo, userRepo)
 	authUseCase := usecase.NewAuthUseCase(userRepo, service.NewJWTService(jwtSecret))
 
-	APIService := handlers.NewCustomAPIService(*infoUseCase, *sendCoinsUseCase, *purchaseUseCase, *authUseCase)
-	APIController := controller.NewCustomAPIController(*APIService, service.NewJWTService(jwtSecret))
+	APIService := http_api.NewCustomAPIService(*infoUseCase, *sendCoinsUseCase, *purchaseUseCase, *authUseCase)
+	APIController := http_api.NewCustomAPIController(*APIService, service.NewJWTService(jwtSecret))
 
 	router := openapi.NewRouter(APIController)
 
 	serverAddress := cfg.GetServerAddress()
 
-	server :=&http.Server{
-		Addr: serverAddress,
+	server := &http.Server{
+		Addr:    serverAddress,
 		Handler: router,
 	}
 

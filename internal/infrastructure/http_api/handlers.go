@@ -1,11 +1,11 @@
-package handlers
+package http_api
 
 import (
 	"context"
 	"errors"
 	"net/http"
 
-	"merch-store/adapter/logger"
+	"merch-store/pkg/logger"
 	"merch-store/api/generated/go"
 	"merch-store/internal/usecase"
 	"merch-store/pkg/middleware"
