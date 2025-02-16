@@ -12,11 +12,11 @@ import (
 func setupTestDB() (*gorm.DB, error) {
 	cfg := &config.Config{
 		DBConfig: config.DBConfig{
-			DATABASE_HOST:     "localhost",
-			DATABASE_PORT:     "5432",
-			DATABASE_USER:     "postgres",
-			DATABASE_PASSWORD: "password",
-			DATABASE_NAME:     "shop",
+			Host:     "localhost",
+			Port:     "5432",
+			User:     "postgres",
+			Password: "password",
+			Name:     "shop",
 		},
 	}
 	dsn, err := cfg.GetDSN()

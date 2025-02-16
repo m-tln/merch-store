@@ -7,7 +7,7 @@ import (
 
 type InfoUseCase struct {
 	userRepo        repository.UsersRepository
-	productsRepo       repository.ProductsRepository
+	productsRepo    repository.ProductsRepository
 	transactionRepo repository.TransactionsRepository
 	purchaseRepo    repository.PurchasesRepository
 }
@@ -16,7 +16,7 @@ func NewInfoUseCase(userRepo repository.UsersRepository, productsRepo repository
 	transactionRepo repository.TransactionsRepository, purchaseRepo repository.PurchasesRepository) *InfoUseCase {
 	return &InfoUseCase{
 		userRepo:        userRepo,
-		productsRepo:       productsRepo,
+		productsRepo:    productsRepo,
 		transactionRepo: transactionRepo,
 		purchaseRepo:    purchaseRepo,
 	}
@@ -52,7 +52,6 @@ func (uc *InfoUseCase) GetInvetory(id int) (map[string]int32, error) {
 
 	return res, nil
 }
-
 
 func (uc *InfoUseCase) GetRecieved(id int) (map[string][]uint, error) {
 	user, err := uc.userRepo.FindByID(id)

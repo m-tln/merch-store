@@ -37,19 +37,19 @@ func (uc *SendCoinUseCase) MakeTransaction(from int, to string, amount int32) er
 		return fmt.Errorf("user with username %s can't be found in db, error: %v", to, err)
 	}
 
-	err = uc.userRepo.UpdateBalance(userFrom.ID, int(userFrom.Balance) - int(amount))
+	err = uc.userRepo.UpdateBalance(userFrom.ID, int(userFrom.Balance)-int(amount))
 	if err != nil {
 		return fmt.Errorf("balance of %v can't be updated, error: %v", from, err)
 	}
 
-	err = uc.userRepo.UpdateBalance(userTo.ID, int(userTo.Balance) + int(amount))
+	err = uc.userRepo.UpdateBalance(userTo.ID, int(userTo.Balance)+int(amount))
 	if err != nil {
 		return fmt.Errorf("balance of %s can't be updated, error: %v", to, err)
 	}
 
 	err = uc.transactionRepo.Create(&domain.Transaction{
 		IDFrom: uint64(userFrom.ID),
-		IDTo: uint64(userTo.ID),
+		IDTo:   uint64(userTo.ID),
 		Volume: uint64(amount),
 	})
 

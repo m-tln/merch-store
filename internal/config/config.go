@@ -6,16 +6,16 @@ import (
 )
 
 type DBConfig struct {
-	DATABASE_PORT     string
-	DATABASE_USER     string
-	DATABASE_PASSWORD string
-	DATABASE_NAME     string
-	DATABASE_HOST     string
+	Port     string
+	User     string
+	Password string
+	Name     string
+	Host     string
 }
 
 type ServerConfig struct {
-	SERVER_PORT string
-	SERVER_HOST string
+	port string
+	host string
 }
 
 type Config struct {
@@ -27,15 +27,15 @@ type Config struct {
 func NewConfig() (*Config, error) {
 	return &Config{
 		DBConfig: DBConfig{
-			DATABASE_HOST:     os.Getenv("DATABASE_HOST"),
-			DATABASE_PORT:     os.Getenv("DATABASE_PORT"),
-			DATABASE_USER:     os.Getenv("DATABASE_USER"),
-			DATABASE_PASSWORD: os.Getenv("DATABASE_PASSWORD"),
-			DATABASE_NAME:     os.Getenv("DATABASE_NAME"),
+			Host:     os.Getenv("DATABASE_HOST"),
+			Port:     os.Getenv("DATABASE_PORT"),
+			User:     os.Getenv("DATABASE_USER"),
+			Password: os.Getenv("DATABASE_PASSWORD"),
+			Name:     os.Getenv("DATABASE_NAME"),
 		},
 		ServerConfig: ServerConfig{
-			SERVER_PORT: os.Getenv("SERVER_PORT"),
-			SERVER_HOST: os.Getenv("SERVER_HOST"),
+			port: os.Getenv("SERVER_PORT"),
+			host: os.Getenv("SERVER_HOST"),
 		},
 		secretJWT: os.Getenv("SECRET_JWT"),
 	}, nil
@@ -44,11 +44,11 @@ func NewConfig() (*Config, error) {
 func (cfg *Config) GetDSN() (string, error) {
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		cfg.DATABASE_HOST,
-		cfg.DATABASE_PORT,
-		cfg.DATABASE_USER,
-		cfg.DATABASE_NAME,
-		cfg.DATABASE_PASSWORD,
+		cfg.DBConfig.Host,
+		cfg.DBConfig.Port,
+		cfg.User,
+		cfg.Name,
+		cfg.Password,
 	), nil
 }
 
@@ -57,11 +57,11 @@ func (cfg *Config) GetSecretJWT() (string, error) {
 }
 
 func (cfg *Config) GetPort() string {
-	return cfg.SERVER_PORT
+	return cfg.ServerConfig.port
 }
 
 func (cfg *Config) GetHost() string {
-	return cfg.SERVER_HOST
+	return cfg.ServerConfig.host
 }
 
 func (cfg *Config) GetServerAddress() string {

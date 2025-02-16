@@ -3,7 +3,7 @@ package repository
 import "time"
 
 type User struct {
-	ID           int `gorm:"primaryKey"`
+	ID           int    `gorm:"primaryKey"`
 	Name         string `gorm:"uniqueIndex"`
 	PasswordHash string
 	Balance      uint64
@@ -26,7 +26,7 @@ func (Product) TableName() string {
 type Purchase struct {
 	IDCostumer uint64 `gorm:"not null"`
 	IDItem     uint64 `gorm:"not null"`
-	Volume     uint64 
+	Volume     uint64
 	CreatedAt  time.Time
 }
 

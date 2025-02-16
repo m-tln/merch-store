@@ -9,7 +9,7 @@ import (
 
 	openapi "merch-store/api/generated/go"
 	"merch-store/internal/config"
-	"merch-store/internal/infrastructure/http_api"
+	httpapi "merch-store/internal/infrastructure/http_api"
 	"merch-store/internal/service"
 	"merch-store/internal/usecase"
 	"merch-store/pkg/logger"
@@ -60,8 +60,8 @@ func NewService() (*Service, error) {
 	purchaseUseCase := usecase.NewPurchaseUseCase(purchaseRepo, productRepo, userRepo)
 	authUseCase := usecase.NewAuthUseCase(userRepo, service.NewJWTService(jwtSecret))
 
-	APIService := http_api.NewCustomAPIService(*infoUseCase, *sendCoinsUseCase, *purchaseUseCase, *authUseCase)
-	APIController := http_api.NewCustomAPIController(*APIService, service.NewJWTService(jwtSecret))
+	APIService := httpapi.NewCustomAPIService(*infoUseCase, *sendCoinsUseCase, *purchaseUseCase, *authUseCase)
+	APIController := httpapi.NewCustomAPIController(*APIService, service.NewJWTService(jwtSecret))
 
 	router := openapi.NewRouter(APIController)
 
@@ -75,7 +75,7 @@ func NewService() (*Service, error) {
 	return &Service{server: server, Log: log, cfg: cfg}, nil
 }
 
-func (svc *Service) Start(ctx context.Context) error {
+func (svc *Service) Start(_ context.Context) error {
 	svc.Log.Info("Starting server...", map[string]interface{}{})
 	return svc.server.ListenAndServe()
 }

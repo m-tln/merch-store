@@ -22,7 +22,7 @@ type Product struct {
 type Purchase struct {
 	IDCostumer uint64
 	IDItem     uint64
-	Volume     uint64 
+	Volume     uint64
 	CreatedAt  time.Time
 }
 

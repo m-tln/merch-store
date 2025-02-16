@@ -42,7 +42,7 @@ func TestTransferCoinsScenario(t *testing.T) {
 	}
 
 	// Transfer coins
-	err = transactionUseCase.MakeTransaction(sendler.ID, receiver.Name, int32(sendler.Balance / 2))
+	err = transactionUseCase.MakeTransaction(sendler.ID, receiver.Name, int32(sendler.Balance/2))
 	if err != nil {
 		t.Fatalf("Failed to transfer coins: %v", err)
 	}
@@ -57,7 +57,7 @@ func TestTransferCoinsScenario(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get sender: %v", err)
 	}
-	if senderAfter.Balance != sendler.Balance - (sendler.Balance / 2) {
+	if senderAfter.Balance != sendler.Balance-(sendler.Balance/2) {
 		t.Error("Wrong sendler balance")
 	}
 
@@ -66,7 +66,7 @@ func TestTransferCoinsScenario(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get receiver: %v", err)
 	}
-	if receiverAfter.Balance != receiver.Balance + (sendler.Balance / 2) {
+	if receiverAfter.Balance != receiver.Balance+(sendler.Balance/2) {
 		t.Error("Wrong receiver balance")
 	}
 

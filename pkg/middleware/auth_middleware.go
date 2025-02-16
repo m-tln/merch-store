@@ -13,6 +13,7 @@ type AuthMiddlewareConfig interface {
 }
 
 type contextKeyUserID string
+
 const KeyUserID contextKeyUserID = "userID"
 
 func AuthMiddleware(config AuthMiddlewareConfig) func(http.HandlerFunc) http.HandlerFunc {
@@ -44,7 +45,7 @@ func AuthMiddleware(config AuthMiddlewareConfig) func(http.HandlerFunc) http.Han
 			if !ok {
 				http.Error(w, "Missing claims", http.StatusInternalServerError)
 			}
-	
+
 			userID, ok := claims["user_id"]
 			if !ok {
 				http.Error(w, "Missing user_id in token", http.StatusInternalServerError)

@@ -1,13 +1,13 @@
-package http_api
+package httpapi
 
 import (
 	"context"
 	"errors"
 	"net/http"
 
-	"merch-store/pkg/logger"
-	"merch-store/api/generated/go"
+	openapi "merch-store/api/generated/go"
 	"merch-store/internal/usecase"
+	"merch-store/pkg/logger"
 	"merch-store/pkg/middleware"
 )
 
@@ -29,7 +29,7 @@ func NewCustomAPIService(infoUseCase usecase.InfoUseCase,
 }
 
 // ApiInfoGet - Получить информацию о монетах, инвентаре и истории транзакций.
-func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse, error) {
+func (s *CustomAPIService) APIInfoGet(ctx context.Context) (openapi.ImplResponse, error) {
 	s.log.Info("Get info", map[string]interface{}{})
 
 	userIDraw := ctx.Value(middleware.KeyUserID)
@@ -44,9 +44,9 @@ func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse
 	var err error
 
 	s.log.Info("Request from user", map[string]interface{}{"userID": userID})
-	responce := openapi.InfoResponse{}
+	response := openapi.InfoResponse{}
 
-	responce.Coins, err = s.infoUseCase.GetBalance(userID)
+	response.Coins, err = s.infoUseCase.GetBalance(userID)
 	if err != nil {
 		s.log.Error("get balance failed", map[string]interface{}{"Error": err})
 		return openapi.Response(http.StatusInternalServerError, openapi.ErrorResponse{Errors: "Internal server error"}), err
@@ -59,7 +59,7 @@ func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse
 	}
 
 	for item, quantity := range inventory {
-		responce.Inventory = append(responce.Inventory, openapi.InfoResponseInventoryInner{Type: item, Quantity: quantity})
+		response.Inventory = append(response.Inventory, openapi.InfoResponseInventoryInner{Type: item, Quantity: quantity})
 	}
 
 	historySent, err := s.infoUseCase.GetSent(userID)
@@ -70,7 +70,7 @@ func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse
 
 	for userTo, transactions := range historySent {
 		for _, transaction := range transactions {
-			responce.CoinHistory.Sent = append(responce.CoinHistory.Sent,
+			response.CoinHistory.Sent = append(response.CoinHistory.Sent,
 				openapi.InfoResponseCoinHistorySentInner{ToUser: userTo, Amount: int32(transaction)})
 		}
 	}
@@ -83,16 +83,16 @@ func (s *CustomAPIService) ApiInfoGet(ctx context.Context) (openapi.ImplResponse
 
 	for userFrom, transactions := range historyReceived {
 		for _, transaction := range transactions {
-			responce.CoinHistory.Received = append(responce.CoinHistory.Received,
+			response.CoinHistory.Received = append(response.CoinHistory.Received,
 				openapi.InfoResponseCoinHistoryReceivedInner{FromUser: userFrom, Amount: int32(transaction)})
 		}
 	}
 
-	return openapi.Response(http.StatusOK, responce), nil
+	return openapi.Response(http.StatusOK, response), nil
 }
 
 // ApiSendCoinPost - Отправить монеты другому пользователю.
-func (s *CustomAPIService) ApiSendCoinPost(ctx context.Context, body openapi.SendCoinRequest) (openapi.ImplResponse, error) {
+func (s *CustomAPIService) APISendCoinPost(ctx context.Context, body openapi.SendCoinRequest) (openapi.ImplResponse, error) {
 	s.log.Info("Send coin post", map[string]interface{}{})
 
 	userIDraw := ctx.Value(middleware.KeyUserID)
@@ -116,7 +116,7 @@ func (s *CustomAPIService) ApiSendCoinPost(ctx context.Context, body openapi.Sen
 }
 
 // ApiBuyItemGet - Купить предмет за монеты.
-func (s *CustomAPIService) ApiBuyItemGet(ctx context.Context, item string) (openapi.ImplResponse, error) {
+func (s *CustomAPIService) APIBuyItemGet(ctx context.Context, item string) (openapi.ImplResponse, error) {
 	s.log.Info("Buy item get", map[string]interface{}{})
 
 	userIDraw := ctx.Value(middleware.KeyUserID)
@@ -140,7 +140,7 @@ func (s *CustomAPIService) ApiBuyItemGet(ctx context.Context, item string) (open
 }
 
 // ApiAuthPost - Аутентификация и получение JWT-токена.
-func (s *CustomAPIService) ApiAuthPost(ctx context.Context, body openapi.AuthRequest) (openapi.ImplResponse, error) {
+func (s *CustomAPIService) APIAuthPost(ctx context.Context, body openapi.AuthRequest) (openapi.ImplResponse, error) {
 	s.log.Info("Auth post", map[string]interface{}{})
 
 	str, err := s.authUseCase.GetToken(body.Username, body.Password)

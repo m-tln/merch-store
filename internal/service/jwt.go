@@ -25,7 +25,7 @@ func (s *JWTService) GenerateToken(userID int) (string, error) {
 }
 
 func (s *JWTService) ValidateToken(tokenString string) (*jwt.Token, error) {
-	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	return jwt.Parse(tokenString, func(_ *jwt.Token) (interface{}, error) {
 		return []byte(s.secretKey), nil
 	})
 }

@@ -1,4 +1,4 @@
-package http_api
+package httpapi
 
 import (
 	"encoding/json"
@@ -53,29 +53,29 @@ func (c *CustomAPIController) Routes() openapi.Routes {
 		"ApiInfoGet": openapi.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "/api/info",
-			HandlerFunc: authMiddleware(c.ApiInfoGet),
+			HandlerFunc: authMiddleware(c.APIInfoGet),
 		},
 		"ApiSendCoinPost": openapi.Route{
 			Method:      strings.ToUpper("Post"),
 			Pattern:     "/api/sendCoin",
-			HandlerFunc: authMiddleware(c.ApiSendCoinPost),
+			HandlerFunc: authMiddleware(c.APISendCoinPost),
 		},
 		"ApiBuyItemGet": openapi.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "/api/buy/{item}",
-			HandlerFunc: authMiddleware(c.ApiBuyItemGet),
+			HandlerFunc: authMiddleware(c.APIBuyItemGet),
 		},
 		"ApiAuthPost": openapi.Route{
 			Method:      strings.ToUpper("Post"),
 			Pattern:     "/api/auth",
-			HandlerFunc: c.ApiAuthPost,
+			HandlerFunc: c.APIAuthPost,
 		},
 	}
 }
 
 // ApiInfoGet - Получить информацию о монетах, инвентаре и истории транзакций.
-func (c *CustomAPIController) ApiInfoGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.ApiInfoGet(r.Context())
+func (c *CustomAPIController) APIInfoGet(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.APIInfoGet(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -85,8 +85,7 @@ func (c *CustomAPIController) ApiInfoGet(w http.ResponseWriter, r *http.Request)
 	_ = openapi.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// ApiSendCoinPost - Отправить монеты другому пользователю.
-func (c *CustomAPIController) ApiSendCoinPost(w http.ResponseWriter, r *http.Request) {
+func (c *CustomAPIController) HandlePost(w http.ResponseWriter, r *http.Request) {
 	var bodyParam openapi.SendCoinRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -102,7 +101,7 @@ func (c *CustomAPIController) ApiSendCoinPost(w http.ResponseWriter, r *http.Req
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.ApiSendCoinPost(r.Context(), bodyParam)
+	result, err := c.service.APISendCoinPost(r.Context(), bodyParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -112,15 +111,20 @@ func (c *CustomAPIController) ApiSendCoinPost(w http.ResponseWriter, r *http.Req
 	_ = openapi.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
+// ApiSendCoinPost - Отправить монеты другому пользователю.
+func (c *CustomAPIController) APISendCoinPost(w http.ResponseWriter, r *http.Request) {
+	c.HandlePost(w, r)
+}
+
 // ApiBuyItemGet - Купить предмет за монеты.
-func (c *CustomAPIController) ApiBuyItemGet(w http.ResponseWriter, r *http.Request) {
+func (c *CustomAPIController) APIBuyItemGet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	itemParam := params["item"]
 	if itemParam == "" {
 		c.errorHandler(w, r, &openapi.RequiredError{Field: "item"}, nil)
 		return
 	}
-	result, err := c.service.ApiBuyItemGet(r.Context(), itemParam)
+	result, err := c.service.APIBuyItemGet(r.Context(), itemParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -131,28 +135,6 @@ func (c *CustomAPIController) ApiBuyItemGet(w http.ResponseWriter, r *http.Reque
 }
 
 // ApiAuthPost - Аутентификация и получение JWT-токена.
-func (c *CustomAPIController) ApiAuthPost(w http.ResponseWriter, r *http.Request) {
-	var bodyParam openapi.AuthRequest
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-	if err := openapi.AssertAuthRequestRequired(bodyParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	if err := openapi.AssertAuthRequestConstraints(bodyParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.ApiAuthPost(r.Context(), bodyParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	_ = openapi.EncodeJSONResponse(result.Body, &result.Code, w)
+func (c *CustomAPIController) APIAuthPost(w http.ResponseWriter, r *http.Request) {
+	c.HandlePost(w, r)
 }

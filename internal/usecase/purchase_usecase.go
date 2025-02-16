@@ -10,11 +10,11 @@ import (
 type PurchaseUseCase struct {
 	purchaseRepo repository.PurchasesRepository
 	productsRepo repository.ProductsRepository
-	userRepo repository.UsersRepository
+	userRepo     repository.UsersRepository
 }
 
-func NewPurchaseUseCase(purchaseRepo repository.PurchasesRepository, productsRepo repository.ProductsRepository, 
-						userRepo repository.UsersRepository) *PurchaseUseCase {
+func NewPurchaseUseCase(purchaseRepo repository.PurchasesRepository, productsRepo repository.ProductsRepository,
+	userRepo repository.UsersRepository) *PurchaseUseCase {
 	return &PurchaseUseCase{purchaseRepo: purchaseRepo, productsRepo: productsRepo, userRepo: userRepo}
 }
 
@@ -33,7 +33,7 @@ func (uc *PurchaseUseCase) MakePurchase(id int, item string) error {
 		return errors.New(SmallBalanceToBuy)
 	}
 
-	err = uc.userRepo.UpdateBalance(user.ID, int(user.Balance - product.Price))
+	err = uc.userRepo.UpdateBalance(user.ID, int(user.Balance-product.Price))
 
 	if err != nil {
 		return fmt.Errorf("balance of %v can't be updated, error: %v", id, err)
@@ -41,8 +41,8 @@ func (uc *PurchaseUseCase) MakePurchase(id int, item string) error {
 
 	err = uc.purchaseRepo.Create(&domain.Purchase{
 		IDCostumer: uint64(user.ID),
-		IDItem: product.ID,
-		Volume: 1,
+		IDItem:     product.ID,
+		Volume:     1,
 	})
 
 	if err != nil {
