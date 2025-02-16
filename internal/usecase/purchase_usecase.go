@@ -9,19 +9,19 @@ import (
 
 type PurchaseUseCase struct {
 	purchaseRepo repository.PurchasesRepository
-	goodsRepo repository.ProductsRepository
+	productsRepo repository.ProductsRepository
 	userRepo repository.UsersRepository
 }
 
-func NewPurchaseUseCase(purchaseRepo repository.PurchasesRepository, goodsRepo repository.ProductsRepository, 
+func NewPurchaseUseCase(purchaseRepo repository.PurchasesRepository, productsRepo repository.ProductsRepository, 
 						userRepo repository.UsersRepository) *PurchaseUseCase {
-	return &PurchaseUseCase{purchaseRepo: purchaseRepo, goodsRepo: goodsRepo, userRepo: userRepo}
+	return &PurchaseUseCase{purchaseRepo: purchaseRepo, productsRepo: productsRepo, userRepo: userRepo}
 }
 
 const SmallBalanceToBuy string = "not enough coins to buy"
 
 func (uc *PurchaseUseCase) MakePurchase(id int, item string) error {
-	good, err := uc.goodsRepo.FindByName(item)
+	product, err := uc.productsRepo.FindByName(item)
 	if err != nil {
 		return fmt.Errorf("%s can't be found in db, error: %v", item, err)
 	}
@@ -29,11 +29,11 @@ func (uc *PurchaseUseCase) MakePurchase(id int, item string) error {
 	if err != nil {
 		return fmt.Errorf("user with username %v can't be found in db, error: %v", id, err)
 	}
-	if user.Balance < good.Price {
+	if user.Balance < product.Price {
 		return errors.New(SmallBalanceToBuy)
 	}
 
-	err = uc.userRepo.UpdateBalance(user.ID, int(user.Balance - good.Price))
+	err = uc.userRepo.UpdateBalance(user.ID, int(user.Balance - product.Price))
 
 	if err != nil {
 		return fmt.Errorf("balance of %v can't be updated, error: %v", id, err)
@@ -41,7 +41,7 @@ func (uc *PurchaseUseCase) MakePurchase(id int, item string) error {
 
 	err = uc.purchaseRepo.Create(&domain.Purchase{
 		IDCostumer: uint64(user.ID),
-		IDItem: good.ID,
+		IDItem: product.ID,
 		Volume: 1,
 	})
 

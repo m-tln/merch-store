@@ -7,16 +7,16 @@ import (
 
 type InfoUseCase struct {
 	userRepo        repository.UsersRepository
-	goodsRepo       repository.ProductsRepository
+	productsRepo       repository.ProductsRepository
 	transactionRepo repository.TransactionsRepository
 	purchaseRepo    repository.PurchasesRepository
 }
 
-func NewInfoUseCase(userRepo repository.UsersRepository, goodsRepo repository.ProductsRepository,
+func NewInfoUseCase(userRepo repository.UsersRepository, productsRepo repository.ProductsRepository,
 	transactionRepo repository.TransactionsRepository, purchaseRepo repository.PurchasesRepository) *InfoUseCase {
 	return &InfoUseCase{
 		userRepo:        userRepo,
-		goodsRepo:       goodsRepo,
+		productsRepo:       productsRepo,
 		transactionRepo: transactionRepo,
 		purchaseRepo:    purchaseRepo,
 	}
@@ -43,7 +43,7 @@ func (uc *InfoUseCase) GetInvetory(id int) (map[string]int32, error) {
 
 	res := make(map[string]int32)
 	for _, purchase := range purchases {
-		item, err := uc.goodsRepo.FindByID(int(purchase.IDItem))
+		item, err := uc.productsRepo.FindByID(int(purchase.IDItem))
 		if err != nil {
 			return map[string]int32{}, fmt.Errorf("%v can't be found in db, error: %v", purchase.IDItem, err)
 		}
