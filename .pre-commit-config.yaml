@@ -1,0 +1,13 @@
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.55.2 # используйте последнюю версию
+    hooks:
+      - id: golangci-lint
+        name: golangci-lint
+        description: Run golangci-lint
+        entry: golangci-lint run --fix # Добавляем --fix для автоматического исправления
+        language: golang
+        types: [go]
+        verbose: true
+        # args: [--fast] # Раскомментируйте для более быстрого запуска (с меньшим количеством линтеров)
