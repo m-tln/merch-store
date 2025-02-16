@@ -10,11 +10,11 @@ import (
 )
 
 type AuthUseCase struct {
-	userRepo   repository.UserRepository
+	userRepo   repository.UsersRepository
 	jwtService *service.JWTService
 }
 
-func NewAuthUseCase(userRepo repository.UserRepository, jwtService *service.JWTService) *AuthUseCase {
+func NewAuthUseCase(userRepo repository.UsersRepository, jwtService *service.JWTService) *AuthUseCase {
 	return &AuthUseCase{userRepo: userRepo, jwtService: jwtService}
 }
 

@@ -8,12 +8,12 @@ import (
 )
 
 type SendCoinUseCase struct {
-	userRepo        repository.UserRepository
-	transactionRepo repository.TransactionRepository
+	userRepo        repository.UsersRepository
+	transactionRepo repository.TransactionsRepository
 }
 
-func NewSendCoinUseCase(userRepo repository.UserRepository,
-	transactionRepo repository.TransactionRepository) *SendCoinUseCase {
+func NewSendCoinUseCase(userRepo repository.UsersRepository,
+	transactionRepo repository.TransactionsRepository) *SendCoinUseCase {
 	return &SendCoinUseCase{
 		userRepo:        userRepo,
 		transactionRepo: transactionRepo,
